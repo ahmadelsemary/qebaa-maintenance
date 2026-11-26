@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صيانات سيارات قباء - المنظومة السحابية</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+  :root {
+    --primary: #1e3a8a;
+    --primary-light: #2563eb;
+    --secondary: #0f766e;
+    --accent: #d97706;
+    --danger: #dc2626;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #1e293b;
+    --border: #cbd5e1;
+  }
+  * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+  body { margin: 0; background: var(--bg); color: var(--text); }
+
+  /* Login Screen */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    padding: 20px;
+  }
+  .login-card {
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .login-card h2 { margin: 0 0 6px; color: var(--primary); font-weight: 800; }
+  .login-card p { margin: 0 0 22px; font-size: 0.85rem; color: #64748b; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  header h1 { margin: 0; font-size: 1.4rem; font-weight: 800; }
+  header p { margin: 4px 0 0; font-size: 0.85rem; color: #cbd5e1; }
+  .signature { font-size: 0.78rem; color: #93c5fd; font-weight: 700; margin-right: 8px; }
+  .header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .header-actions button {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    position: relative;
+    transition: 0.2s;
+  }
+  .header-actions button:hover { background: rgba(255,255,255,0.28); }
+  .notif-badge {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: none;
+  }
+
+  .container { max-width: 1400px; margin: 20px auto; padding: 0 16px; }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .kpi-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-right: 5px solid var(--primary-light);
+  }
+  .kpi-card.green { border-right-color: var(--secondary); }
+  .kpi-card.amber { border-right-color: var(--accent); }
+  .kpi-card.purple { border-right-color: #7c3aed; }
+  .kpi-title { font-size: 0.85rem; color: #64748b; font-weight: 700; }
+  .kpi-value { font-size: 1.65rem; font-weight: 800; color: #0f172a; margin-top: 6px; }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    background: #e2e8f0;
+    padding: 6px;
+    border-radius: 12px;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 11px 14px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .tab-btn.active { background: var(--primary); color: white; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .panel {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+  }
+  .panel-title {
+    font-size: 1.12rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .search-box {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: #eff6ff;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #bfdbfe;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  input, select, textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.92rem;
+    outline: none;
+    width: 100%;
+  }
+  input[readonly] { background: #f8fafc; color: #334155; font-weight: 700; }
+
+  .car-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .info-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; }
+  .info-item span { display: block; font-size: 0.78rem; color: #64748b; font-weight: 700; }
+  .info-item strong { display: block; font-size: 1rem; color: #0f172a; margin-top: 3px; }
+
+  .car-summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  .car-summary-bar div span { font-size: 0.8rem; color: #166534; font-weight: 700; }
+  .car-summary-bar div strong { display: block; font-size: 1.25rem; color: #14532d; font-weight: 800; }
+
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .form-group { display: flex; flex-direction: column; text-align: right; }
+  .form-group label { font-size: 0.85rem; font-weight: 700; margin-bottom: 5px; color: #334155; }
+
+  .btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-primary { background: var(--primary-light); color: white; }
+  .btn-success { background: var(--secondary); color: white; }
+  .btn-amber { background: var(--accent); color: white; padding: 5px 10px; font-size: 0.8rem; }
+  .btn-danger { background: var(--danger); color: white; padding: 5px 10px; font-size: 0.8rem; }
+
+  .table-responsive { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th, td { padding: 10px 12px; text-align: right; border-bottom: 1px solid #e2e8f0; }
+  th { background: #1e293b; color: white; font-weight: 700; white-space: nowrap; }
+  .badge { padding: 3px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; background: #dbeafe; color: #1e40af; }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.65);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+  .modal-box {
+    background: white;
+    border-radius: 14px;
+    max-width: 650px;
+    width: 100%;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+  .msg-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #f8fafc;
+  }
+  .msg-item.alert-license { border-right: 4px solid var(--danger); background: #fef2f2; }
+  .msg-item.alert-update { border-right: 4px solid var(--secondary); background: #f0fdf4; }
+  
+  #loadingBanner {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: #0f172a;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+
+<div id="loadingBanner">⏳ جاري المزامنة مع السحابة...</div>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h2>🚛 صيانات سيارات قباء</h2>
+    <p>تسجيل الدخول إلى المنظومة السحابية المركزية</p>
+    <form onsubmit="handleLogin(event)">
+      <div class="form-group" style="margin-bottom:14px;">
+        <label>البريد الإلكتروني / اسم المستخدم</label>
+        <input type="email" id="loginEmail" required placeholder="admin@qabaa.com">
+      </div>
+      <div class="form-group" style="margin-bottom:20px;">
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPass" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">دخول للمنظومة</button>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
+  <header>
+    <div>
+      <h1>🚛 صيانات سيارات قباء</h1>
+      <p>
+        منظومة إدارة ومتابعة صيانات أسطول شركة قباء وتوزيع الفروع والتكاليف
+        <span class="signature">(بواسطة / أحمد السمري)</span>
+      </p>
+    </div>
+    <div class="header-actions">
+      <button onclick="syncFromCloud(true)">🔄 تحديث البيانات</button>
+      <button onclick="openExportModal()">📊 تصدير تقارير إكسيل</button>
+      <button onclick="downloadCloudBackup()">💾 تحميل نسخة احتياطية</button>
+      <button onclick="openNotifModal()">
+        🔔 الإشعارات والرسائل
+        <span class="notif-badge" id="notifBadge">0</span>
+      </button>
+      <button onclick="handleLogout()" style="background:rgba(220,38,38,0.35);">🚪 خروج (<span id="currentUserName"></span>)</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- ONE-CLICK INITIAL FLEET UPLOAD BANNER (Shows only if Cars sheet is empty) -->
+    <div id="seedFleetBanner" style="display:none; background:#fef3c7; border:2px solid #f59e0b; padding:16px; border-radius:12px; margin-bottom:20px; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <strong style="color:#92400e; font-size:1.05rem;">⚠️ قاعدة البيانات السحابية فارغة حالياً من السيارات!</strong>
+        <p style="margin:4px 0 0; color:#78350f; font-size:0.88rem;">اضغط على الزر المجاور لرفع بيانات الـ 373 سيارة الخاصة بشركة قباء إلى السحابة دفعة واحدة الآن.</p>
+      </div>
+      <button class="btn btn-success" onclick="uploadInitial373Cars()">🚀 رفع الـ 373 سيارة للسحابة الآن</button>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><span class="kpi-title">إجمالي الأسطول</span><span class="kpi-value" id="kpiTotalCars">0</span></div>
+      <div class="kpi-card green"><span class="kpi-title">إجمالي الصيانات (ج.م)</span><span class="kpi-value" id="kpiTotalCost">0</span></div>
+      <div class="kpi-card amber"><span class="kpi-title">عدد الفواتير المسجلة</span><span class="kpi-value" id="kpiTotalInvoices">0</span></div>
+      <div class="kpi-card purple"><span class="kpi-title">الفروع والتوكيلات</span><span class="kpi-value" id="kpiTotalBranches">0</span></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('queryTab', this)">🔍 استعلام عن سيارة</button>
+      <button class="tab-btn" onclick="switchTab('addInvoiceTab', this)">📝 تسجيل فاتورة صيانة</button>
+      <button class="tab-btn" onclick="switchTab('allInvoicesTab', this)">📋 سجل الفواتير العام</button>
+      <button class="tab-btn" onclick="switchTab('branchesTab', this)">🏢 الفروع والتوكيلات</button>
+      <button class="tab-btn" id="tabFleetAdmin" onclick="switchTab('fleetTab', this)">⚙️ إدارة الأسطول</button>
+      <button class="tab-btn" id="tabUsersAdmin" onclick="switchTab('usersTab', this)">👥 المستخدمون والصلاحيات</button>
+    </div>
+
+    <!-- TAB 1: QUERY -->
+    <div id="queryTab" class="tab-content active">
+      <div class="panel">
+        <div class="panel-title">بطاقة الاستعلام الشاملة عن السيارة وسجل صيانتها</div>
+        <div class="search-box">
+          <label style="font-weight:800; color:var(--primary);">رقم السيارة (اللوحة):</label>
+          <input list="platesList" id="queryPlateInput" placeholder="اكتب رقم اللوحة..." style="max-width:260px; font-weight:800;" oninput="lookupCarForQuery()">
+          <datalist id="platesList"></datalist>
+        </div>
+        <div class="car-info-grid">
+          <div class="info-item"><span>رقم اللوحة</span><strong id="qPlate">-</strong></div>
+          <div class="info-item"><span>التوكيل / الفرع</span><strong id="qBranch">-</strong></div>
+          <div class="info-item"><span>الموديل والنوعية</span><strong id="qModelType">-</strong></div>
+          <div class="info-item"><span>رقم الشاسيه</span><strong id="qChassis">-</strong></div>
+          <div class="info-item"><span>رقم الموتور</span><strong id="qEngine">-</strong></div>
+          <div class="info-item"><span>انتهاء الرخصة</span><strong id="qLicenseExp">-</strong></div>
+        </div>
+        <div class="car-summary-bar">
+          <div><span>إجمالي تكلفة صيانات السيارة</span><strong id="qCarTotalCost">0 ج.م</strong></div>
+          <div><span>عدد الفواتير المسجلة</span><strong id="qCarInvCount">0 فاتورة</strong></div>
+          <div><span>آخر قراءة عداد</span><strong id="qCarLastKm">-</strong></div>
+          <div><span>تاريخ آخر صيانة</span><strong id="qCarLastDate">-</strong></div>
+        </div>
+        <h3 style="color:var(--primary);">🛠️ سجل الصيانات (مرتبة من الأقدم للأحدث)</h3>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>م</th><th>التاريخ</th><th>العداد</th><th>النوع</th><th>بيان الأعمال</th><th>الورشة</th><th>قطع الغيار</th><th>المصنعية</th><th>الإجمالي</th><th>صورة الفاتورة</th><th>بواسطة</th>
+              </tr>
+            </thead>
+            <tbody id="qCarHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: ADD INVOICE -->
+    <div id="addInvoiceTab" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">تسجيل فاتورة صيانة جديدة</div>
+        <form id="invoiceForm" onsubmit="saveNewInvoice(event)">
+          <div class="form-grid">
+            <div class="form-group"><label>رقم السيارة (اللوحة) *</label><input list="platesList" id="invPlate" required oninput="autoFillInvoiceCar()"></div>
+            <div class="form-group"><label>التوكيل / الفرع (تلقائي)</label><input type="text" id="invBranch" readonly></div>
+            <div class="form-group"><label>الموديل والنوعية (تلقائي)</label><input type="text" id="invModelType" readonly></div>
+            <div class="form-group"><label>تاريخ الفاتورة *</label><input type="date" id="invDate" required></div>
+            <div class="form-group"><label>قراءة العداد (كم) *</label><input type="number" id="invKm" required></div>
+            <div class="form-group">
+              <label>نوع الصيانة *</label>
+              <select id="invServiceType">
+                <option value="صيانة دورية">صيانة دورية</option>
+                <option value="عفشة وفرامل">عفشة وفرامل</option>
+                <option value="ميكانيكا وموتور">ميكانيكا وموتور</option>
+                <option value="كهرباء وبطارية">كهرباء وبطارية</option>
+                <option value="إطارات وكاوتش">إطارات وكاوتش</option>
+                <option value="صيانة تبريد / ثلاجة">صيانة تبريد / ثلاجة</option>
+                <option value="أخرى">أخرى</option>
+              </select>
+            </div>
+            <div class="form-group"><label>مركز الخدمة / الورشة *</label><input type="text" id="invWorkshop" required></div>
+            <div class="form-group"><label>قطع الغيار (ج.م) *</label><input type="number" id="invParts" value="0" min="0" step="0.01" required oninput="calcInvoiceTotal()"></div>
+            <div class="form-group"><label>المصنعية (ج.م) *</label><input type="number" id="invLabor" value="0" min="0" step="0.01" required oninput="calcInvoiceTotal()"></div>
+            <div class="form-group"><label>الإجمالي (تلقائي)</label><input type="text" id="invTotal" readonly value="0 ج.م"></div>
+            <div class="form-group"><label>📎 صورة الفاتورة (اختياري)</label><input type="file" id="invImageFile" accept="image/*"></div>
+          </div>
+          <div class="form-group" style="margin-top:14px;"><label>بيان الأعمال والقطع المستبدلة *</label><input type="text" id="invDesc" required></div>
+          <button type="submit" class="btn btn-success" style="margin-top:16px;">💾 حفظ الفاتورة وإرسال إشعار للإدارة</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 3: ALL INVOICES -->
+    <div id="allInvoicesTab" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">سجل الفواتير العام</div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr><th>م</th><th>التاريخ</th><th>السيارة</th><th>الفرع</th><th>النوع</th><th>البيان</th><th>الإجمالي</th><th>الفاتورة</th><th>المسجل</th><th id="thDelInv">إجراء</th></tr>
+            </thead>
+            <tbody id="allInvoicesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: BRANCHES -->
+    <div id="branchesTab" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">إحصائيات الفروع والتوكيلات</div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>م</th><th>الفرع / التوكيل</th><th>عدد السيارات</th><th>عدد الفواتير</th><th>إجمالي التكلفة</th></tr></thead>
+            <tbody id="branchesSummaryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: FLEET ADMIN -->
+    <div id="fleetTab" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">
+          <span>إدارة الأسطول وتوزيع السيارات (إضافة / نقل فرع / حذف)</span>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <input type="text" id="filterFleetAdmin" placeholder="🔍 بحث برقم اللوحة أو الفرع..." oninput="renderFleetTable()" style="width:240px;">
+            <button class="btn btn-success" onclick="openCarModal()">➕ إضافة سيارة / فرع جديد</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead><tr><th>م</th><th>اللوحة</th><th>الفرع</th><th>الموديل</th><th>النوعية</th><th>الشاسيه</th><th>انتهاء الرخصة</th><th>إجراءات</th></tr></thead>
+            <tbody id="fleetTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: USERS & PERMISSIONS (SUPER ADMIN ONLY) -->
+    <div id="usersTab" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">إدارة المستخدمين والصلاحيات (خاص بمدير النظام)</div>
+        <form onsubmit="registerNewSystemUser(event)" style="margin-bottom:20px; background:#f8fafc; padding:16px; border-radius:10px;">
+          <div class="form-grid">
+            <div class="form-group"><label>اسم الموظف *</label><input type="text" id="newUserName" required placeholder="مثال: مشرف المنصورية"></div>
+            <div class="form-group"><label>البريد الإلكتروني للدخول *</label><input type="email" id="newUserEmail" required placeholder="mansouria@qabaa.com"></div>
+            <div class="form-group"><label>كلمة المرور *</label><input type="text" id="newUserPass" required placeholder="123456"></div>
+            <div class="form-group">
+              <label>الدور والصلاحية *</label>
+              <select id="newUserRole" onchange="toggleBranchAssign()">
+                <option value="supervisor">مشرف فرع (إدخال فواتير فرعه فقط)</option>
+                <option value="auditor">مدير مراجعة (مراجعة كل الفروع بدون حذف)</option>
+                <option value="admin">مدير صيانة عام (صلاحيات كاملة)</option>
+              </select>
+            </div>
+            <div class="form-group" id="assignBranchGroup">
+              <label>الفرع التابع له (للمشرفين)</label>
+              <input list="branchesList" id="newUserBranch" placeholder="اختر الفرع...">
+              <datalist id="branchesList"></datalist>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:12px;">➕ إنشاء حساب المستخدم</button>
+        </form>
+        <table>
+          <thead><tr><th>الاسم</th><th>البريد الإلكتروني</th><th>كلمة المرور</th><th>الصلاحية</th><th>الفرع المخصص</th></tr></thead>
+          <tbody id="usersListBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADVANCED EXPORT MODAL -->
+<div id="exportModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header"><h3>📊 تصدير تقارير الفواتير إلى Excel</h3><button class="close-modal" onclick="closeModal('exportModal')">&times;</button></div>
+    <div class="form-grid">
+      <div class="form-group"><label>من تاريخ</label><input type="date" id="expFromDate"></div>
+      <div class="form-group"><label>إلى تاريخ</label><input type="date" id="expToDate"></div>
+      <div class="form-group">
+        <label>نطاق التقرير</label>
+        <select id="expScope" onchange="toggleExportScopeInput()">
+          <option value="all">كامل الأسطول</option>
+          <option value="branch">فرع / توكيل محدد</option>
+          <option value="car">سيارة محددة برقم اللوحة</option>
+        </select>
+      </div>
+      <div class="form-group" id="expTargetGroup" style="display:none;">
+        <label id="expTargetLabel">اختر</label>
+        <input list="platesList" id="expTargetInput">
+      </div>
+    </div>
+    <button class="btn btn-success" style="margin-top:18px; width:100%;" onclick="executeAdvancedExport()">📥 تحميل ملف الإكسيل الآن</button>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS & INTERNAL MESSAGING MODAL -->
+<div id="notifModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header"><h3>🔔 مركز الإشعارات والرسائل الداخلية</h3><button class="close-modal" onclick="closeModal('notifModal')">&times;</button></div>
+    <div style="background:#eff6ff; padding:12px; border-radius:8px; margin-bottom:16px;">
+      <h4 style="margin:0 0 8px; color:var(--primary);">✉️ إرسال رسالة لمستخدم آخر بالمنظومة</h4>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>إلى المستخدم</label>
+          <select id="msgRecipientSelect"></select>
+        </div>
+        <div class="form-group">
+          <label>نص الرسالة</label>
+          <input type="text" id="msgBodyInput" placeholder="اكتب رسالتك هنا...">
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:8px;" onclick="sendInternalMessage()">إرسال الرسالة</button>
+    </div>
+    <h4 style="margin:0 0 10px;">📥 التنبيهات والرسائل الواردة</h4>
+    <div id="notificationsContainer" style="max-height:300px; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- IMAGE PREVIEW MODAL -->
+<div id="imagePreviewModal" class="modal-overlay">
+  <div class="modal-box" style="text-align:center;">
+    <div class="modal-header"><h3>🧾 صورة الفاتورة</h3><button class="close-modal" onclick="closeModal('imagePreviewModal')">&times;</button></div>
+    <img id="previewImgTag" src="" style="max-width:100%; border-radius:8px; border:1px solid #cbd5e1;" alt="صورة الفاتورة">
+  </div>
+</div>
+
+<!-- CAR MODAL -->
+<div id="carModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header"><h3 id="carModalTitle">بيانات السيارة وتوزيع الفرع</h3><button class="close-modal" onclick="closeModal('carModal')">&times;</button></div>
+    <form onsubmit="saveCarData(event)">
+      <input type="hidden" id="editOrigPlate">
+      <div class="form-grid">
+        <div class="form-group"><label>رقم اللوحة *</label><input type="text" id="mPlate" required></div>
+        <div class="form-group"><label>الفرع / التوكيل *</label><input list="branchesList" id="mBranch" required></div>
+        <div class="form-group"><label>الموديل *</label><input type="text" id="mModel" required></div>
+        <div class="form-group"><label>النوعية *</label><input type="text" id="mType" required></div>
+        <div class="form-group"><label>الشاسيه</label><input type="text" id="mChassis"></div>
+        <div class="form-group"><label>الموتور</label><input type="text" id="mEngine"></div>
+        <div class="form-group"><label>شركة التأجير</label><input type="text" id="mLeasing"></div>
+        <div class="form-group"><label>انتهاء الرخصة</label><input type="text" id="mLicenseExp" placeholder="25/12/2026"></div>
+      </div>
+      <button type="submit" class="btn btn-success" style="margin-top:16px; width:100%;">💾 حفظ التعديلات على السحابة</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjjVPJ6-pHKhUKs2kz7Yz4ceDuBGfydyP9HEyF-ZaJBAQpEG1KDneA2YRiq8AKzECz/exec";
+  const EMBEDDED_373_CARS = [{"id": 1, "plate": "ا ص ى 5621", "branch": "افكو مسطرد", "model": "2023", "type": "NPR", "chassis": "127723", "engine": "520", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 2, "plate": "ا ج ى 3148", "branch": "افكو مسطرد", "model": "2023", "type": "TFR - ثلاجة", "chassis": "138987", "engine": "4731", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "25/12/2026", "license_status": "سارية"}, {"id": 3, "plate": "ا ط ف 4839", "branch": "افكو مسطرد", "model": "2023", "type": "TFR", "chassis": "138851", "engine": "5560", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/11/2025", "license_status": "سارية"}, {"id": 4, "plate": "ا ل ف 9131", "branch": "افكو مسطرد", "model": "2025", "type": "TFR - ثلاجة", "chassis": "168970", "engine": "7404", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 5, "plate": "ا ل م 8212", "branch": "افكو مسطرد", "model": "2026", "type": "TFR", "chassis": "176298", "engine": "4306", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 6, "plate": "ا ص ن 3926", "branch": "افكو مسطرد", "model": "2022", "type": "TFR", "chassis": "104876", "engine": "1412", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 7, "plate": "ا ل م 8186", "branch": "افكو مسطرد", "model": "2026", "type": "TFR", "chassis": "178776", "engine": "4133", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 8, "plate": "ا ل م 8189", "branch": "افكو مسطرد", "model": "2026", "type": "TFR", "chassis": "178669", "engine": "4377", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 9, "plate": "ا ج ى 5973", "branch": "افكو مسطرد", "model": "2023", "type": "TFR", "chassis": "138793", "engine": "4750", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-05-02", "license_status": "سارية"}, {"id": 10, "plate": "ا ج ى 3142", "branch": "افكو مسطرد - مودرن تريد", "model": "2023", "type": "TFR - ثلاجة", "chassis": "138919", "engine": "5037", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "25/12/2026", "license_status": "سارية"}, {"id": 11, "plate": "ا ج ى 3145", "branch": "افكو مسطرد - مودرن تريد", "model": "2023", "type": "TFR - ثلاجة", "chassis": "138929", "engine": "5058", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/12/2026", "license_status": "سارية"}, {"id": 12, "plate": "ا ط ا 5238", "branch": "افكو مسطرد - مودرن تريد", "model": "2026", "type": "TFR - ثلاجة", "chassis": "191301", "engine": "3522", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-11-08", "license_status": "ثاني مرة"}, {"id": 13, "plate": "ا ل ق 9394", "branch": "افكو مسطرد - مودرن تريد", "model": "2025", "type": "NPR", "chassis": "175238", "engine": "852", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-10-08", "license_status": "سارية"}, {"id": 14, "plate": "ا ل ق 6163", "branch": "افكو مسطرد - مودرن تريد", "model": "2025", "type": "NPR", "chassis": "173182", "engine": "641", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "14/7/2026", "license_status": "سارية"}, {"id": 15, "plate": "ا ل ف 2898", "branch": "افكو مسطرد - مودرن تريد", "model": "2025", "type": "NPR - ثلاجة", "chassis": "167230", "engine": "334", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "18/1/2026", "license_status": "سارية"}, {"id": 16, "plate": "ا ل و 9242", "branch": "افكو مسطرد - مودرن تريد", "model": "2026", "type": "NPR", "chassis": "182843", "engine": "751", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "17/11/2026", "license_status": "سارية"}, {"id": 17, "plate": "ا د و 4865", "branch": "افكو المقطم", "model": "2022", "type": "NPR", "chassis": "73461", "engine": "682", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "19/6/2026", "license_status": "سارية"}, {"id": 18, "plate": "ا ل م 9492", "branch": "افكو المقطم", "model": "2026", "type": "QMR", "chassis": "177347", "engine": "53", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "21/7/2026", "license_status": "سارية"}, {"id": 19, "plate": "ا ط ا 4986", "branch": "افكو المقطم", "model": "2026", "type": "NPR - ثلاجة", "chassis": "193337", "engine": "77", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-10-08", "license_status": "ثاني مرة"}, {"id": 20, "plate": "ا د ف 3685", "branch": "افكو المقطم", "model": "2022", "type": "TFR", "chassis": "109655", "engine": "5000", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 21, "plate": "ا د ف 3689", "branch": "افكو المقطم", "model": "2022", "type": "TFR", "chassis": "109523", "engine": "4263", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 22, "plate": "ا ل ف 9139", "branch": "افكو المقطم", "model": "2025", "type": "ثلاجة -TFR", "chassis": "168840", "engine": "7701", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 23, "plate": "ا ل ق 6151", "branch": "صافولا شرق", "model": "2025", "type": "NPR", "chassis": "173183", "engine": "22", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "14/7/2026", "license_status": "سارية"}, {"id": 24, "plate": "ا ل ق 5951", "branch": "صافولا شرق", "model": "2025", "type": "NPR", "chassis": "173157", "engine": "247", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "14/7/2026", "license_status": "سارية"}, {"id": 25, "plate": "ا ل ق 6156", "branch": "صافولا شرق", "model": "2025", "type": "NPR", "chassis": "173173", "engine": "22", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "14/7/2026", "license_status": "سارية"}, {"id": 26, "plate": "ا ل ق 6162", "branch": "صافولا شرق", "model": "2025", "type": "NPR", "chassis": "173192", "engine": "664", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "14/7/2026", "license_status": "سارية"}, {"id": 27, "plate": "ا ل م 8198", "branch": "صافولا شرق", "model": "2026", "type": "QMR", "chassis": "177353", "engine": "77", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 28, "plate": "ا ل م 8191", "branch": "صافولا شرق", "model": "2026", "type": "QMR", "chassis": "177325", "engine": "16", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 29, "plate": "ا ل ق 7176", "branch": "صافولا شرق", "model": "2025", "type": "QMR", "chassis": "173626", "engine": "49", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "27/7/2026", "license_status": "سارية"}, {"id": 30, "plate": "ا ل م 9489", "branch": "صافولا شرق", "model": "2026", "type": "QMR", "chassis": "177327", "engine": "71", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "21/7/2026", "license_status": "سارية"}, {"id": 31, "plate": "ا ل ق 7175", "branch": "صافولا شرق", "model": "2025", "type": "QMR", "chassis": "175684", "engine": "45", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "27/7/2026", "license_status": "سارية"}, {"id": 32, "plate": "ا ل ق 7181", "branch": "صافولا شرق", "model": "2025", "type": "QMR", "chassis": "175683", "engine": "61", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "27/7/2026", "license_status": "سارية"}, {"id": 33, "plate": "ا ل ق 9493", "branch": "صافولا شرق", "model": "2025", "type": "TFR - ثلاجة", "chassis": "171807", "engine": "9931", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-10-08", "license_status": "سارية"}, {"id": 35, "plate": "ا د و 4861", "branch": "صافولا وسط", "model": "2022", "type": "NKR", "chassis": "74097", "engine": "4", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "24/6/2025", "license_status": "سارية"}, {"id": 36, "plate": "ا ص ن 3925", "branch": "صافولا وسط", "model": "2022", "type": "NKR", "chassis": "113101", "engine": "24", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 37, "plate": "ا ص ن 3927", "branch": "صافولا وسط", "model": "2022", "type": "NKR", "chassis": "113091", "engine": "37", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2027-02-01", "license_status": "سارية"}, {"id": 38, "plate": "ا ص ن 3928", "branch": "صافولا وسط", "model": "2022", "type": "NKR", "chassis": "113094", "engine": "42", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "23/1/2026", "license_status": "سارية"}, {"id": 39, "plate": "ا ص ى 3718", "branch": "صافولا وسط", "model": "2022", "type": "TFR", "chassis": "109623", "engine": "4285", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "26/7/2026", "license_status": "سارية"}, {"id": 40, "plate": "ا ص ى 3691", "branch": "صافولا وسط", "model": "2022", "type": "TFR", "chassis": "109517", "engine": "4350", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "26/7/2026", "license_status": "سارية"}, {"id": 41, "plate": "ا ص ى 3694", "branch": "صافولا وسط", "model": "2022", "type": "NKR", "chassis": "122513", "engine": "6", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "26/7/2026", "license_status": "سارية"}, {"id": 42, "plate": "ا ص ى 3716", "branch": "صافولا وسط", "model": "2022", "type": "NKR", "chassis": "122515", "engine": "13", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "26/7/2026", "license_status": "سارية"}, {"id": 43, "plate": "ا ر و 7634", "branch": "صافولا وسط", "model": "2022", "type": "NPR - كولمان", "chassis": "92856", "engine": "402", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-10-11", "license_status": "سارية"}, {"id": 44, "plate": "ا ر و 7639", "branch": "صافولا وسط", "model": "2022", "type": "NPR - كولمان", "chassis": "92845", "engine": "874", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-10-11", "license_status": "سارية"}, {"id": 46, "plate": "ا ل ع 8353", "branch": "فيتراك القاهرة", "model": "2025", "type": "TFR", "chassis": "163206", "engine": "2896", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "23/12/2026", "license_status": "سارية"}, {"id": 47, "plate": "ا ل ق 7178", "branch": "فيتراك القاهرة", "model": "2025", "type": "QMR", "chassis": "173636", "engine": "2", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "27/7/2026", "license_status": "سارية"}, {"id": 48, "plate": "ا ل ق 7179", "branch": "فيتراك القاهرة", "model": "2025", "type": "QMR", "chassis": "173624", "engine": "48", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "27/7/2026", "license_status": "سارية"}, {"id": 49, "plate": "ا ل ع 8358", "branch": "فيتراك القاهرة", "model": "2025", "type": "TFR", "chassis": "163363", "engine": "2440", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "23/12/2026", "license_status": "سارية"}, {"id": 50, "plate": "ا ل ف 9129", "branch": "فيتراك القاهرة", "model": "2025", "type": "TFR", "chassis": "168827", "engine": "7461", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 51, "plate": "ا ل ف 9141", "branch": "فيتراك القاهرة", "model": "2025", "type": "TFR", "chassis": "169113", "engine": "7723", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "16/2/2027", "license_status": "سارية"}, {"id": 52, "plate": "ا ل ع 8368", "branch": "فيتراك القاهرة", "model": "2025", "type": "TFR", "chassis": "163039", "engine": "2432", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "23/12/2026", "license_status": "سارية"}, {"id": 53, "plate": "ا ل ع 8348", "branch": "فيتراك القاهرة", "model": "2025", "type": "TFR", "chassis": "163198", "engine": "2362", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "23/12/2026", "license_status": "سارية"}, {"id": 54, "plate": "ا ل ع 8363", "branch": "فيتراك القاهرة", "model": "2025", "type": "TFR", "chassis": "163228", "engine": "2468", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "23/12/2026", "license_status": "سارية"}, {"id": 55, "plate": "ا ل ا 8413", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "1545", "engine": "5078010", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 56, "plate": "ا ل ا 8417", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "1146", "engine": "5067975", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 57, "plate": "ا ل ا 8415", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "2243", "engine": "7100198", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 58, "plate": "ا ل ط 1451", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "2006", "engine": "7093870", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/12/2026", "license_status": "سارية"}, {"id": 59, "plate": "ا ل ا 8395", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "612", "engine": "2040914", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-04-08", "license_status": "سارية"}, {"id": 60, "plate": "ا ل ا 8392", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "551", "engine": "2015424", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 61, "plate": "ا ل ا 8412", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "1994", "engine": "7093897", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 62, "plate": "ا ل ا 8391", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "775", "engine": "44671", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 63, "plate": "ا ل ا 8379", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "1206", "engine": "5070371", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 64, "plate": "ا ل ا 8439", "branch": "الفان مسطرد", "model": "2022", "type": "JMC", "chassis": "356", "engine": "157912", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-08", "license_status": "سارية"}, {"id": 65, "plate": "ا ل ى 6268", "branch": "جونسون مسطرد", "model": "2026", "type": "NPR", "chassis": "182726", "engine": "621", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "17/11/2026", "license_status": "ثاني مرة"}, {"id": 66, "plate": "ا ب و 7913", "branch": "جونسون مسطرد", "model": "2026", "type": "TFR", "chassis": "206103", "engine": "8912", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "25/7/2026", "license_status": "اول مرة"}, {"id": 67, "plate": "ا ل د 9491", "branch": "جونسون مسطرد", "model": "2024", "type": "QMR", "chassis": "156471", "engine": "45", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "22/7/2026", "license_status": "سارية"}, {"id": 68, "plate": "ا ل ن 8969", "branch": "جونسون مسطرد", "model": "2026", "type": "TFR", "chassis": "178723", "engine": "6535", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "17/9/2026", "license_status": "سارية"}, {"id": 69, "plate": "ا ل و 9239", "branch": "جونسون مسطرد", "model": "2026", "type": "NPR", "chassis": "184277", "engine": "490", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "17/11/2026", "license_status": "سارية"}, {"id": 70, "plate": "ا ل ط 6979", "branch": "جونسون مسطرد", "model": "2024", "type": "QMR", "chassis": "154518", "engine": "32", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "31/1/2026", "license_status": "سارية"}, {"id": 69, "plate": "ر ج م 8471", "branch": "جونسون مسطرد", "model": "2022", "type": "TFR", "chassis": "104365", "engine": "1372", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "17/8/2026", "license_status": "سارية"}, {"id": 71, "plate": "ا ب و 8571", "branch": "جونسون مسطرد", "model": "2026", "type": "NPR", "chassis": "205335", "engine": "616", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-03-08", "license_status": "اول مرة"}, {"id": 72, "plate": "ا ل ب 1614", "branch": "حبة حبة المنصورية", "model": "2024", "type": "TFR", "chassis": "149638", "engine": "1325", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-09", "license_status": "سارية"}, {"id": 73, "plate": "ا ل ب 1615", "branch": "حبة حبة المنصورية", "model": "2024", "type": "TFR", "chassis": "149659", "engine": "1542", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-09", "license_status": "سارية"}, {"id": 74, "plate": "ا ل ص 4974", "branch": "حبة حبة المنصورية", "model": "2025", "type": "TFR", "chassis": "163282", "engine": "2286", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-04-11", "license_status": "سارية"}, {"id": 75, "plate": "ا د و 4859", "branch": "حبة حبة المنصورية", "model": "2022", "type": "NKR", "chassis": "74155", "engine": "61", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "19/6/2026", "license_status": "سارية"}, {"id": 76, "plate": "ا د ف 3687", "branch": "حبة حبة المنصورية", "model": "2022", "type": "TFR", "chassis": "109533", "engine": "4771", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "22/7/2026", "license_status": "سارية"}, {"id": 77, "plate": "ا د و  4856", "branch": "حبة حبة المنصورية", "model": "2022", "type": "NKR", "chassis": "74142", "engine": "74", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-10-05", "license_status": "سارية"}, {"id": 78, "plate": "ا ر و 3658", "branch": "حبة حبة المنصورية", "model": "2022", "type": "NPR - بيك اب", "chassis": "84221", "engine": "812", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "14/9/2026", "license_status": "سارية"}, {"id": 79, "plate": "ا ر و 3654", "branch": "حبة حبة المنصورية", "model": "2022", "type": "NPR - بيك اب", "chassis": "84197", "engine": "785", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "14/9/2026", "license_status": "سارية"}, {"id": 80, "plate": "ا ط ف 4926", "branch": "حبة حبة المنصورية", "model": "2023", "type": "NPR - بيك اب", "chassis": "132625", "engine": "954", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "25/11/2026", "license_status": "سارية"}, {"id": 81, "plate": "ا م ص 3927", "branch": "حبة حبة المنصورية", "model": "2020", "type": "NKR", "chassis": "989438", "engine": "4218", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-10-11", "license_status": "سارية"}, {"id": 82, "plate": "ا ط ف 4917", "branch": "حبة حبة قليوب", "model": "2022", "type": "NKR", "chassis": "122500", "engine": "24", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/11/2025", "license_status": "سارية"}, {"id": 83, "plate": "ا ط ف 4923", "branch": "حبة حبة قليوب", "model": "2022", "type": "NKR", "chassis": "122427", "engine": "23", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "25/11/2026", "license_status": "سارية"}, {"id": 84, "plate": "ا ط ف 4928", "branch": "حبة حبة قليوب", "model": "2022", "type": "NKR", "chassis": "122496", "engine": "73", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "25/11/2026", "license_status": "سارية"}, {"id": 85, "plate": "ا ط ف 4852", "branch": "حبة حبة قليوب", "model": "2023", "type": "TFR", "chassis": "138819", "engine": "3785", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/11/2025", "license_status": "سارية"}, {"id": 86, "plate": "ا ط ف 4832", "branch": "حبة حبة قليوب", "model": "2023", "type": "TFR", "chassis": "138876", "engine": "5104", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/11/2025", "license_status": "سارية"}, {"id": 87, "plate": "ا ط ف 4851", "branch": "حبة حبة قليوب", "model": "2023", "type": "TFR", "chassis": "138942", "engine": "4766", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/11/2025", "license_status": "سارية"}, {"id": 88, "plate": "ا ط ف 4835", "branch": "حبة حبة قليوب", "model": "2023", "type": "TFR", "chassis": "138828", "engine": "5015", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/11/2025", "license_status": "سارية"}, {"id": 89, "plate": "ا ط ف 4853", "branch": "حبة حبة قليوب", "model": "2023", "type": "TFR", "chassis": "136720", "engine": "4925", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/11/2025", "license_status": "سارية"}, {"id": 90, "plate": "ا ط ف 4921", "branch": "حبة حبة قليوب", "model": "2023", "type": "NPR - بيك اب", "chassis": "132603", "engine": "115", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "25/11/2026", "license_status": "سارية"}, {"id": 91, "plate": "ا س ى 8687", "branch": "حبة حبة قليوب", "model": "2023", "type": "ملاكي - اوبترا", "chassis": "143695", "engine": "31010484", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "23/11/2025", "license_status": "سارية"}, {"id": 92, "plate": "ا ل ب 1636", "branch": "حبة حبة قليوب", "model": "2024", "type": "TFR", "chassis": "148945", "engine": "1565", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-09", "license_status": "سارية"}, {"id": 93, "plate": "ا ل ب 1646", "branch": "حبة حبة قليوب", "model": "2024", "type": "TFR", "chassis": "150525", "engine": "1684", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-09", "license_status": "سارية"}, {"id": 94, "plate": "ا ل ب 1631", "branch": "حبة حبة قليوب", "model": "2024", "type": "TFR", "chassis": "149894", "engine": "1376", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-09", "license_status": "سارية"}, {"id": 95, "plate": "ا ل ب 1641", "branch": "حبة حبة قليوب", "model": "2024", "type": "TFR", "chassis": "150440", "engine": "1276", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-09", "license_status": "سارية"}, {"id": 96, "plate": "ا ل س 5759", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228289", "engine": "1058558", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 97, "plate": "ا ل س 5625", "branch": "اولكر الجيزة", "model": "2024", "type": "ميتسوبيشي - اكليبس", "chassis": "10874", "engine": "92254", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 98, "plate": "ا ل س 5767", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229406", "engine": "1061888", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 99, "plate": "ا ل س 5676", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229368", "engine": "1061648", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 100, "plate": "ا ل س 5758", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229173", "engine": "1061359", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 101, "plate": "ا ل س 5785", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228561", "engine": "1059283", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 102, "plate": "ا ل س 5795", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228756", "engine": "1059681", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 103, "plate": "ا ل س 5797", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229833", "engine": "1063169", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 104, "plate": "ا ل س 5787", "branch": "اولكر الجيزة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228416", "engine": "1058800", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 105, "plate": "ا ل ص 5295", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "250", "engine": "59641", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-05-11", "license_status": "سارية"}, {"id": 106, "plate": "ا ل ص 5343", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "251", "engine": "55083", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-05-11", "license_status": "سارية"}, {"id": 107, "plate": "ا ل ص 5292", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "243", "engine": "55088", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 108, "plate": "ا ل ص 5313", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "236", "engine": "51697", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-05-11", "license_status": "سارية"}, {"id": 109, "plate": "ا ل ص 7257", "branch": "اولكر الجيزة", "model": "2022", "type": "JMC", "chassis": "2306", "engine": "7101347", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 110, "plate": "ا ل ن 9838", "branch": "اولكر الجيزة", "model": "2025", "type": "Fuso - ثلاجة", "chassis": "45110", "engine": "33507698", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "23/9/2026", "license_status": "سارية"}, {"id": 111, "plate": "ا ل ن 9828", "branch": "اولكر الجيزة", "model": "2025", "type": "Fuso - ثلاجة", "chassis": "45112", "engine": "33507705", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "23/9/2026", "license_status": "سارية"}, {"id": 112, "plate": "ا ط ا 2461", "branch": "اولكر الجيزة", "model": "2026", "type": "NPR - ثلاجة", "chassis": "200020", "engine": "570", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "18/7/2026", "license_status": "ثاني مرة"}, {"id": 113, "plate": "ا ل ن 5717", "branch": "اولكر الجيزة", "model": "2026", "type": "NPR - ثلاجة", "chassis": "184376", "engine": "212", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 114, "plate": "ا ل ص 5323", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "237", "engine": "51688", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-02", "license_status": "سارية"}, {"id": 115, "plate": "ا ل ص 5315", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "235", "engine": "51703", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-02", "license_status": "سارية"}, {"id": 116, "plate": "ا ل ط 1434", "branch": "اولكر الجيزة", "model": "2022", "type": "JMC - ثلاجة", "chassis": "2506", "engine": "7104183", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/12/2026", "license_status": "سارية"}, {"id": 117, "plate": "ا ل و 6396", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1016", "engine": "3008944", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 118, "plate": "ا ب و 7968", "branch": "اولكر الجيزة", "model": "2026", "type": "TFR - ثلاجة", "chassis": "206076", "engine": "2542", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "26/7/2026", "license_status": "اول مرة"}, {"id": 119, "plate": "ا ب و 7963", "branch": "اولكر الجيزة", "model": "2026", "type": "TFR - ثلاجة", "chassis": "206037", "engine": "2435", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "26/7/2026", "license_status": "اول مرة"}, {"id": 120, "plate": "ا ص ا 7593", "branch": "اولكر الجيزة", "model": "2026", "type": "TFR", "chassis": "206078", "engine": "2601", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-11-07", "license_status": "اول مرة"}, {"id": 121, "plate": "ا ل و 6383", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1013", "engine": "3008947", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 122, "plate": "ا ل و 6376", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1002", "engine": "3008864", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 123, "plate": "ا ل و 6373", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1175", "engine": "3011030", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 124, "plate": "ا ل ن 5626", "branch": "اولكر الجيزة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1091", "engine": "3010397", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 125, "plate": "ا ل ن 9818", "branch": "اولكر الجيزة", "model": "2026", "type": "NPR - ثلاجة", "chassis": "184395", "engine": "938", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/9/2026", "license_status": "سارية"}, {"id": 126, "plate": "ا ج ى 3146", "branch": "اولكر كبار العملاء", "model": "2023", "type": "TFR - ثلاجة", "chassis": "138932", "engine": "5064", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "25/12/2026", "license_status": "سارية"}, {"id": 127, "plate": "س ن ر 3392", "branch": "اولكر كبار العملاء", "model": "2023", "type": "TFR - ثلاجة", "chassis": "138804", "engine": "4466", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-01-09", "license_status": "سارية"}, {"id": 128, "plate": "ا ل ن 4849", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NQR - ثلاجة", "chassis": "184426", "engine": "948", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "20/8/2026", "license_status": "سارية"}, {"id": 129, "plate": "ا ط ا 6283", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "199902", "engine": "82", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "18/8/2026", "license_status": "ثاني مرة"}, {"id": 130, "plate": "ا ل ن 6846", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "184370", "engine": "914", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-09", "license_status": "سارية"}, {"id": 131, "plate": "ا ط ا 5234", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "200055", "engine": "868", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-09-08", "license_status": "ثاني مرة"}, {"id": 132, "plate": "ا ل ى 3585", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "182887", "engine": "241", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-08", "license_status": "ثالث مرة"}, {"id": 133, "plate": "ا ط ا 5148", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "200073", "engine": "722", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-11-08", "license_status": "ثاني مرة"}, {"id": 134, "plate": "ا ل ن 6848", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "182620", "engine": "694", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-09", "license_status": "سارية"}, {"id": 135, "plate": "ا ل ن 4847", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "184359", "engine": "511", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "20/8/2026", "license_status": "سارية"}, {"id": 136, "plate": "ا ل ن 5725", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "182840", "engine": "127", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 137, "plate": "ا ط ا 6284", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "200171", "engine": "351", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "18/8/2026", "license_status": "ثاني مرة"}, {"id": 138, "plate": "ا ط ا 5147", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "205313", "engine": "99", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-09-08", "license_status": "ثاني مرة"}, {"id": 139, "plate": "ا ط ا 5138", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "200179", "engine": "29", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-11-08", "license_status": "ثاني مرة"}, {"id": 140, "plate": "ا ل ن 9819", "branch": "اولكر كبار العملاء", "model": "2025", "type": "Fuso - ثلاجة", "chassis": "45109", "engine": "33507693", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "23/9/2026", "license_status": "سارية"}, {"id": 141, "plate": "ا ل ن 6838", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "184279", "engine": "366", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-09", "license_status": "سارية"}, {"id": 142, "plate": "ا ل ن 6856", "branch": "اولكر كبار العملاء", "model": "2026", "type": "NPR - ثلاجة", "chassis": "182871", "engine": "708", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-09", "license_status": "سارية"}, {"id": 143, "plate": "ا ل ص 5345", "branch": "اولكر تجزئة بهتيم", "model": "2025", "type": "JMC - ثلاجة", "chassis": "256", "engine": "59586", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 144, "plate": "ا ل ا 8462", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "JMC - ثلاجة", "chassis": "407", "engine": "160302", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-08", "license_status": "سارية"}, {"id": 145, "plate": "ا ل ص 5352", "branch": "اولكر تجزئة بهتيم", "model": "2025", "type": "JMC - ثلاجة", "chassis": "260", "engine": "55074", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 146, "plate": "ا ج ى 3127", "branch": "اولكر تجزئة بهتيم", "model": "2023", "type": "TFR - ثلاجة", "chassis": "138805", "engine": "4867", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/12/2026", "license_status": "سارية"}, {"id": 147, "plate": "ا ج ى 3129", "branch": "اولكر تجزئة بهتيم", "model": "2023", "type": "TFR - ثلاجة", "chassis": "138952", "engine": "4730", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "26/12/2026", "license_status": "سارية"}, {"id": 148, "plate": "ا ر و 7648", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "NPR", "chassis": "92853", "engine": "850", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-10-11", "license_status": "سارية"}, {"id": 149, "plate": "ا ط ا 5146", "branch": "اولكر تجزئة بهتيم", "model": "2026", "type": "NPR - ثلاجة", "chassis": "205321", "engine": "553", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-09-08", "license_status": "ثاني مرة"}, {"id": 150, "plate": "ا ل س 5275", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "سوزوكي كاري", "chassis": "229585", "engine": "1062414", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 151, "plate": "ا ل س 5285", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "سوزوكي كاري", "chassis": "228408", "engine": "108555", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 152, "plate": "ا ل س 5292", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "سوزوكي كاري", "chassis": "229508", "engine": "1062000", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 153, "plate": "ا ل س 5282", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "سوزوكي كاري", "chassis": "229201", "engine": "1060948", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 154, "plate": "ا ل س 5815", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "سوزوكي كاري", "chassis": "229876", "engine": "1063283", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 155, "plate": "ا ل س 5818", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "سوزوكي كاري", "chassis": "228896", "engine": "1060040", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 156, "plate": "س م ص 3832", "branch": "اولكر تجزئة بهتيم", "model": "2023", "type": "QMR", "chassis": "137903", "engine": "76", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "13/10/2025", "license_status": "سارية"}, {"id": 157, "plate": "ا ل ف 4676", "branch": "اولكر تجزئة بهتيم", "model": "2025", "type": "سوزوكي فان", "chassis": "503553", "engine": "1274525", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 158, "plate": "ا ل ط 7273", "branch": "اولكر تجزئة بهتيم", "model": "2022", "type": "JMC - ثلاجة", "chassis": "2150", "engine": "7097962", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-08", "license_status": "سارية"}, {"id": 159, "plate": "ا ل و 6434", "branch": "اولكر تجزئة بهتيم", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1082", "engine": "3010350", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 160, "plate": "ا ل ن 5615", "branch": "اولكر تجزئة بهتيم", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1046", "engine": "3009730", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 161, "plate": "ا ل س 5616", "branch": "اولكر القاهرة", "model": "2024", "type": "ميتسوبيشي - اكليبس - ثلاجة", "chassis": "10980", "engine": "93419", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 162, "plate": "ا ل س 5645", "branch": "اولكر القاهرة", "model": "2024", "type": "ميتسوبيشي - GB", "chassis": "10983", "engine": "93441", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 163, "plate": "ا ل س 5635", "branch": "اولكر القاهرة", "model": "2024", "type": "ميتسوبيشي - اكليبس", "chassis": "10981", "engine": "93424", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 164, "plate": "ا ل س 5626", "branch": "اولكر القاهرة", "model": "2024", "type": "ميتسوبيشي - GB", "chassis": "10982", "engine": "93429", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-07-08", "license_status": "سارية"}, {"id": 165, "plate": "ا ل ص 8616", "branch": "اولكر القاهرة", "model": "2022", "type": "JMC - ثلاجة", "chassis": "1513", "engine": "5076726", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-10", "license_status": "سارية"}, {"id": 166, "plate": "ا ل ا 8461", "branch": "اولكر القاهرة", "model": "2022", "type": "JMC", "chassis": "452", "engine": "162114", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-08", "license_status": "سارية"}, {"id": 167, "plate": "ا ب و 7964", "branch": "اولكر القاهرة", "model": "2026", "type": "TFR - ثلاجة", "chassis": "206060", "engine": "2619", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "26/7/2026", "license_status": "اول مرة"}, {"id": 168, "plate": "ا ص ا 7592", "branch": "اولكر القاهرة", "model": "2026", "type": "TFR", "chassis": "206081", "engine": "2493", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-11-07", "license_status": "اول مرة"}, {"id": 169, "plate": "ا ل ص 7323", "branch": "اولكر القاهرة", "model": "2022", "type": "JMC - ثلاجة", "chassis": "1948", "engine": "83212", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 170, "plate": "ا ل س 5425", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228797", "engine": "1059987", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 171, "plate": "ا ل س 5434", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229745", "engine": "1063055", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 172, "plate": "ا ل س 5675", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229913", "engine": "1063373", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 173, "plate": "ا ل س 5414", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229696", "engine": "1062678", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 174, "plate": "ا ل س 5686", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229376", "engine": "1061718", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 175, "plate": "ا ل س 5696", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228868", "engine": "1060048", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 176, "plate": "ا ل س 5685", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228860", "engine": "1060190", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 177, "plate": "ا ل س 5765", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229320", "engine": "1061488", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/8/2026", "license_status": "سارية"}, {"id": 178, "plate": "ا ل س 5415", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229076", "engine": "1060746", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 179, "plate": "ا ل س 5295", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "228373", "engine": "1058803", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 180, "plate": "ا ل س 5695", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229884", "engine": "1063378", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 181, "plate": "ا ل س 5424", "branch": "اولكر القاهرة", "model": "2022", "type": "سوزوكي كاري", "chassis": "229652", "engine": "1062488", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/8/2026", "license_status": "سارية"}, {"id": 182, "plate": "ا ل ط 1481", "branch": "اولكر القاهرة", "model": "2022", "type": "JMC - ثلاجة", "chassis": "2447", "engine": "7103627", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/12/2026", "license_status": "سارية"}, {"id": 183, "plate": "ا ل ص 5325", "branch": "اولكر القاهرة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "241", "engine": "55172", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-05-11", "license_status": "سارية"}, {"id": 184, "plate": "ا ل ص 5285", "branch": "اولكر القاهرة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "247", "engine": "55163", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-05-11", "license_status": "سارية"}, {"id": 185, "plate": "ا ل ا 8452", "branch": "اولكر القاهرة", "model": "2022", "type": "JMC - ثلاجة", "chassis": "386", "engine": "160295", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-08", "license_status": "سارية"}, {"id": 186, "plate": "ا ل ا 8451", "branch": "اولكر القاهرة", "model": "2022", "type": "JMC", "chassis": "1612", "engine": "6082904", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-05-08", "license_status": "سارية"}, {"id": 187, "plate": "ا ل و 6424", "branch": "اولكر القاهرة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1030", "engine": "3009732", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 188, "plate": "ا ل و 6416", "branch": "اولكر القاهرة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1089", "engine": "3010387", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 189, "plate": "ا ل و 6414", "branch": "اولكر القاهرة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1035", "engine": "3009533", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 190, "plate": "ا ل ن 5625", "branch": "اولكر القاهرة", "model": "2025", "type": "JMC - ثلاجة", "chassis": "1074", "engine": "3009536", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/8/2026", "license_status": "سارية"}, {"id": 191, "plate": "ا ج ل 4641", "branch": "بن شاهين قليوب", "model": "2023", "type": "سوزوكي فان", "chassis": "503144", "engine": "1270868", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-02-08", "license_status": "سارية"}, {"id": 192, "plate": "ا ج ل 4642", "branch": "بن شاهين قليوب", "model": "2023", "type": "سوزوكي فان", "chassis": "503211", "engine": "1272279", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "30/7/2026", "license_status": "سارية"}, {"id": 193, "plate": "ا ج ل 4643", "branch": "بن شاهين قليوب", "model": "2023", "type": "سوزوكي فان", "chassis": "503164", "engine": "1270888", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-02-08", "license_status": "سارية"}, {"id": 194, "plate": "ا ل ن 9697", "branch": "بن شاهين قليوب", "model": "2025", "type": "JMC", "chassis": "1080", "engine": "3010392", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "23/9/2026", "license_status": "سارية"}, {"id": 195, "plate": "ا ج ل 4645", "branch": "بن شاهين قليوب", "model": "2023", "type": "سوزوكي فان", "chassis": "503149", "engine": "1270870", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 196, "plate": "ا ج ل 4547", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503152", "engine": "1270877", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 197, "plate": "ا ج ل 4565", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503213", "engine": "1272276", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-02-08", "license_status": "سارية"}, {"id": 198, "plate": "ا ج ل 4535", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503207", "engine": "1272272", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-02-08", "license_status": "سارية"}, {"id": 199, "plate": "ا ج ل 4546", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503157", "engine": "1270889", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 200, "plate": "ا ج ل 4542", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503208", "engine": "1272211", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 201, "plate": "ا ج ل 4543", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503162", "engine": "1270882", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 202, "plate": "ا ج ل 4548", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503182", "engine": "1272281", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 203, "plate": "ا ج ل 4394", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503166", "engine": "1270880", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 204, "plate": "ا ج ل 4525", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503209", "engine": "1272207", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "2026-02-08", "license_status": "سارية"}, {"id": 205, "plate": "ا ل ق 3937", "branch": "بن شاهين الجيزة", "model": "2025", "type": "JMC", "chassis": "681", "engine": "1002573", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/3/2027", "license_status": "سارية"}, {"id": 206, "plate": "ا ج ل 4514", "branch": "بن شاهين الجيزة", "model": "2023", "type": "سوزوكي فان", "chassis": "503156", "engine": "1270813", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 207, "plate": "ا ج ل 4541", "branch": "بن شاهين مسطرد", "model": "2023", "type": "سوزوكي فان", "chassis": "503199", "engine": "1272280", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "29/7/2026", "license_status": "سارية"}, {"id": 208, "plate": "ا ل ط 1431", "branch": "بن شاهين مسطرد", "model": "2022", "type": "JMC", "chassis": "2421", "engine": "7102491", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/12/2026", "license_status": "سارية"}, {"id": 209, "plate": "ا ل ط 1474", "branch": "بن شاهين مسطرد", "model": "2022", "type": "JMC", "chassis": "2226", "engine": "7098589", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/12/2026", "license_status": "سارية"}, {"id": 210, "plate": "ا ل ص 1751", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "228520", "engine": "1059103", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-12-01", "license_status": "سارية"}, {"id": 211, "plate": "ا ل ص 1747", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "229104", "engine": "1060918", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-12-01", "license_status": "سارية"}, {"id": 212, "plate": "ا ل ص 1741", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "229152", "engine": "1061023", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-12-01", "license_status": "سارية"}, {"id": 213, "plate": "ا ل ص 1757", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "228324", "engine": "1059755", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-12-01", "license_status": "سارية"}, {"id": 214, "plate": "ا ل س 4616", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "A53T00228769", "engine": "1059787", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "17/8/2026", "license_status": "سارية"}, {"id": 215, "plate": "ا ل س 4594", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "A53T00229041", "engine": "1060632", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "17/8/2026", "license_status": "سارية"}, {"id": 216, "plate": "ا ل س 4595", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "A53T00229257", "engine": "1061200", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "17/8/2026", "license_status": "سارية"}, {"id": 217, "plate": "ا ل س 4614", "branch": "بن شاهين مسطرد", "model": "2022", "type": "سوزوكي كاري", "chassis": "A53T00228484", "engine": "1059218", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "17/8/2026", "license_status": "سارية"}, {"id": 218, "plate": "ر ج م 8461", "branch": "دريم الجيزة", "model": "2022", "type": "TFR", "chassis": "104803", "engine": "2007", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "19/8/2026", "license_status": "سارية"}, {"id": 220, "plate": "س ع ه 2428", "branch": "مولفيكس 15 مايو", "model": "2025", "type": "NQR", "chassis": "173584", "engine": "912", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "13/8/2025", "license_status": "اول مرة اسكندرية"}, {"id": 221, "plate": "ا ل د 9479", "branch": "مولفيكس 15 مايو", "model": "2024", "type": "TFR", "chassis": "153636", "engine": "4404", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "23/4/2026", "license_status": "سارية"}, {"id": 222, "plate": "ا ل د 9489", "branch": "مولفيكس 15 مايو", "model": "2024", "type": "TFR", "chassis": "153559", "engine": "4666", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "22/7/2026", "license_status": "سارية"}, {"id": 223, "plate": "ا ل د 9484", "branch": "مولفيكس 15 مايو", "model": "2024", "type": "TFR", "chassis": "153634", "engine": "4405", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "22/7/2026", "license_status": "سارية"}, {"id": 224, "plate": "ا ل د 9474", "branch": "مولفيكس 15 مايو", "model": "2024", "type": "TFR", "chassis": "156719", "engine": "6491", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "23/4/2026", "license_status": "سارية"}, {"id": 225, "plate": "س ع ه 2429", "branch": "مولفيكس 15 مايو", "model": "2025", "type": "NQR", "chassis": "173564", "engine": "593", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "13/8/2025", "license_status": "اول مرة اسكندرية"}, {"id": 226, "plate": "ا ج م 4959", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "1453", "engine": "5076058", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 227, "plate": "ا ج م 4974", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "2167", "engine": "7098993", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 228, "plate": "ا ج م 4984", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "301", "engine": "156160", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 229, "plate": "ا ج م 4989", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "2250", "engine": "7100200", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 230, "plate": "ا ج م 5121", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "281", "engine": "156153", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 231, "plate": "ا ج م 4954", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "1151", "engine": "5068430", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 232, "plate": "ا ج م 4894", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "2027", "engine": "7094185", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "23/6/2026", "license_status": "سارية"}, {"id": 233, "plate": "ا ج م 4874", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "2507", "engine": "7107639", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 234, "plate": "ا ج م 4948", "branch": "الحرية المرج", "model": "2022", "type": "JMC", "chassis": "1132", "engine": "4066652", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/6/2026", "license_status": "سارية"}, {"id": 235, "plate": "ا ج م 4898", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "2374", "engine": "7102493", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 236, "plate": "ا ج م 4929", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "480", "engine": "163311", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 237, "plate": "ا ج م 4934", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "1396", "engine": "5073273", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 238, "plate": "ا ج م 4941", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "2040", "engine": "7095741", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 239, "plate": "ا ج م 4943", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "1102", "engine": "4066700", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/6/2026", "license_status": "سارية"}, {"id": 240, "plate": "ا ل ص 6916", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "1979", "engine": "7093900", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 241, "plate": "ا ل ص 6919", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "2275", "engine": "7100780", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 242, "plate": "ا ل ص 6929", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "2298", "engine": "7100770", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 243, "plate": "ا ل ص 6939", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "2477", "engine": "7103622", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 244, "plate": "ا ل ص 6898", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "2321", "engine": "7100767", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 245, "plate": "ا ل ا 8456", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "860", "engine": "3048406", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-08", "license_status": "سارية"}, {"id": 246, "plate": "ا ل ا 8457", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "311", "engine": "156017", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-08", "license_status": "سارية"}, {"id": 247, "plate": "ا ل ا 8459", "branch": "الحرية المقطم", "model": "2022", "type": "JMC", "chassis": "343", "engine": "156596", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-06-08", "license_status": "سارية"}, {"id": 248, "plate": "ا ل ب 7937", "branch": "ليدر عين شمس", "model": "2024", "type": "TFR", "chassis": "151712", "engine": "3117", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "27/10/2025", "license_status": "سارية"}, {"id": 249, "plate": "ا ل ب 3432", "branch": "ليدر عين شمس", "model": "2024", "type": "QMR", "chassis": "149574", "engine": "36", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-11-09", "license_status": "سارية"}, {"id": 250, "plate": "ا ل ب 7939", "branch": "ليدر عين شمس", "model": "2024", "type": "TFR", "chassis": "151220", "engine": "2891", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "27/10/2025", "license_status": "سارية"}, {"id": 251, "plate": "ا ل م 8232", "branch": "ليدر عين شمس", "model": "2026", "type": "TFR", "chassis": "178470", "engine": "4242", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 252, "plate": "ا ل ص 6535", "branch": "ليدر عين شمس", "model": "2024", "type": "TFR", "chassis": "153405", "engine": "3763", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "28/11/2025", "license_status": "سارية"}, {"id": 253, "plate": "ا ل ص 8283", "branch": "ليدر عين شمس", "model": "2024", "type": "TFR", "chassis": "153215", "engine": "3886", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 254, "plate": "ا ط ا 2467", "branch": "ليدر عين شمس", "model": "2026", "type": "TFR", "chassis": "190759", "engine": "5735", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 255, "plate": "ا ط ا 2468", "branch": "ليدر عين شمس", "model": "2026", "type": "TFR", "chassis": "191339", "engine": "5987", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 256, "plate": "ا ل ص 5121", "branch": "ليدر عين شمس", "model": "2025", "type": "TFR", "chassis": "163295", "engine": "2497", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 257, "plate": "ا ل ط 6356", "branch": "ليدر عين شمس", "model": "2024", "type": "QMR", "chassis": "154515", "engine": "93", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/1/2027", "license_status": "سارية"}, {"id": 258, "plate": "ا ب و 7953", "branch": "ليدر عين شمس", "model": "2026", "type": "TFR", "chassis": "206094", "engine": "2585", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "26/7/2026", "license_status": "اول مرة"}, {"id": 259, "plate": "ا ل د 3736", "branch": "ليدر عين شمس", "model": "2024", "type": "QMR", "chassis": "155713", "engine": "40", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2027-05-03", "license_status": "سارية"}, {"id": 260, "plate": "ا د و 4857", "branch": "ليدر عين شمس", "model": "2022", "type": "NKR", "chassis": "74169", "engine": "88", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "19/6/2026", "license_status": "سارية"}, {"id": 261, "plate": "ا ل د 3739", "branch": "ليدر عين شمس", "model": "2024", "type": "QMR", "chassis": "155460", "engine": "88", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-05-03", "license_status": "سارية"}, {"id": 262, "plate": "ا ط ا 2463", "branch": "ليدر عين شمس", "model": "2026", "type": "TFR", "chassis": "191290", "engine": "2396", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 263, "plate": "ا ص ى 3714", "branch": "ليدر عين شمس ( المصنع )", "model": "2022", "type": "NKR", "chassis": "122432", "engine": "28", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "26/7/2026", "license_status": "سارية"}, {"id": 264, "plate": "ا ل ى 6267", "branch": "ليدر عين شمس ( ايجار )", "model": "2026", "type": "NPR", "chassis": "182676", "engine": "5", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 265, "plate": "ا ل ص 6526", "branch": "ليدر البدرشين", "model": "2024", "type": "TFR", "chassis": "153412", "engine": "3747", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/11/2026", "license_status": "سارية"}, {"id": 266, "plate": "ا ل ص 8281", "branch": "ليدر البدرشين", "model": "2024", "type": "TFR", "chassis": "153316", "engine": "3815", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-10-12", "license_status": "سارية"}, {"id": 267, "plate": "ا ل ب 1619", "branch": "ليدر البدرشين", "model": "2024", "type": "TFR", "chassis": "150562", "engine": "3308", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-09", "license_status": "سارية"}, {"id": 268, "plate": "ا ل ب 3431", "branch": "ليدر البدرشين", "model": "2024", "type": "NKR", "chassis": "149578", "engine": "59", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-10-09", "license_status": "سارية"}, {"id": 269, "plate": "ا ل ص 5375", "branch": "ليدر البدرشين", "model": "2025", "type": "NPR", "chassis": "162582", "engine": "897", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 270, "plate": "ا ط ا 2469", "branch": "ليدر البدرشين", "model": "2026", "type": "TFR", "chassis": "190790", "engine": "2210", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 271, "plate": "ا ل ص 4984", "branch": "ليدر البدرشين", "model": "2025", "type": "TFR", "chassis": "163127", "engine": "2553", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 272, "plate": "ا ل ص 6515", "branch": "ليدر البدرشين", "model": "2024", "type": "TFR", "chassis": "152021", "engine": "1644", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/11/2026", "license_status": "سارية"}, {"id": 273, "plate": "ا ل ص 8284", "branch": "ليدر البدرشين", "model": "2024", "type": "TFR", "chassis": "153381", "engine": "4106", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "2026-10-12", "license_status": "سارية"}, {"id": 274, "plate": "ا ب و 7896", "branch": "ليدر البدرشين", "model": "2026", "type": "TFR", "chassis": "206069", "engine": "2510", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "25/7/2026", "license_status": "اول مرة"}, {"id": 275, "plate": "ا ل ط 6989", "branch": "ليدر البدرشين", "model": "2024", "type": "QMR", "chassis": "154511", "engine": "11", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "31/1/2026", "license_status": "سارية"}, {"id": 276, "plate": "ا ط ا 2471", "branch": "ليدر البدرشين", "model": "2026", "type": "TFR", "chassis": "191379", "engine": "2554", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 277, "plate": "ا ل ص 4989", "branch": "ليدر البدرشين", "model": "2025", "type": "TFR", "chassis": "163280", "engine": "2498", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 278, "plate": "ا ل م 9539", "branch": "ليدر البدرشين", "model": "2026", "type": "NPR", "chassis": "182685", "engine": "117", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "21/7/2026", "license_status": "سارية"}, {"id": 279, "plate": "ا ل و 8382", "branch": "ليدر البدرشين", "model": "2025", "type": "TFR", "chassis": "171338", "engine": "9255", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 280, "plate": "ا ل م 9529", "branch": "ليدر البدرشين", "model": "2026", "type": "NPR", "chassis": "177248", "engine": "201", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "21/7/2026", "license_status": "سارية"}, {"id": 281, "plate": "ا ل ب 7927", "branch": "ليدر قليوب", "model": "2024", "type": "TFR", "chassis": "151082", "engine": "2617", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "27/10/2025", "license_status": "سارية"}, {"id": 282, "plate": "ا ل ب 7947", "branch": "ليدر قليوب", "model": "2024", "type": "TFR", "chassis": "151946", "engine": "2588", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "27/10/2025", "license_status": "سارية"}, {"id": 283, "plate": "ا ل م 8182", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "176288", "engine": "4284", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 284, "plate": "ا ل م 8178", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "178879", "engine": "4122", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 285, "plate": "ا ل ط 6362", "branch": "ليدر قليوب", "model": "2024", "type": "QMR", "chassis": "154519", "engine": "43", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "24/1/2027", "license_status": "سارية"}, {"id": 286, "plate": "ا ل د 9493", "branch": "ليدر قليوب", "model": "2024", "type": "QMR", "chassis": "157299", "engine": "94", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "22/7/2026", "license_status": "سارية"}, {"id": 287, "plate": "ا ط ا 2538", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "191190", "engine": "2386", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 288, "plate": "ا ط ا 2539", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "191132", "engine": "5946", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 289, "plate": "ا ل ن 8281", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "180783", "engine": "6503", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "13/9/2026", "license_status": "سارية"}, {"id": 290, "plate": "ا ل ب 1618", "branch": "ليدر قليوب", "model": "2024", "type": "TFR", "chassis": "150926", "engine": "3392", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-09", "license_status": "سارية"}, {"id": 291, "plate": "ا ط ا 2541", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "191078", "engine": "5923", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 292, "plate": "ا ل ب 3424", "branch": "ليدر قليوب", "model": "2024", "type": "QMR", "chassis": "149588", "engine": "82", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-11-09", "license_status": "سارية"}, {"id": 293, "plate": "ا ط ا 2543", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "191352", "engine": "5941", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 294, "plate": "ا ل ص 6525", "branch": "ليدر قليوب", "model": "2024", "type": "TFR", "chassis": "153411", "engine": "3743", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "25/11/2026", "license_status": "سارية"}, {"id": 295, "plate": "ا ل ن 8968", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "180747", "engine": "6478", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "17/9/2026", "license_status": "سارية"}, {"id": 296, "plate": "ا ط ا 2546", "branch": "ليدر قليوب", "model": "2026", "type": "TFR", "chassis": "191139", "engine": "5921", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-11-07", "license_status": "ثاني مرة"}, {"id": 297, "plate": "ا ل ب 7929", "branch": "ليدر قليوب", "model": "2024", "type": "TFR", "chassis": "151904", "engine": "3245", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "27/10/2025", "license_status": "سارية"}, {"id": 298, "plate": "ا ل ط 6364", "branch": "ليدر قليوب", "model": "2024", "type": "QMR", "chassis": "152810", "engine": "86", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "27/1/2026", "license_status": "سارية"}, {"id": 299, "plate": "ا د و 4862", "branch": "ليدر بنها", "model": "2022", "type": "NKR", "chassis": "74121", "engine": "99", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "16/12/2025", "license_status": "سارية"}, {"id": 300, "plate": "ا ل ط 6361", "branch": "ليدر بنها", "model": "2024", "type": "QMR", "chassis": "152816", "engine": "2", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "27/1/2026", "license_status": "سارية"}, {"id": 301, "plate": "ا ل ص 5383", "branch": "ليدر بنها", "model": "2025", "type": "NPR", "chassis": "162598", "engine": "754", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-03-11", "license_status": "سارية"}, {"id": 302, "plate": "ا ل م 9535", "branch": "ليدر بنها", "model": "2026", "type": "NPR", "chassis": "177227", "engine": "586", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "21/7/2026", "license_status": "سارية"}, {"id": 303, "plate": "ا ل م 8187", "branch": "ليدر بنها", "model": "2026", "type": "TFR", "chassis": "178910", "engine": "4105", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 304, "plate": "ا ل ق 7363", "branch": "ليدر بنها", "model": "2025", "type": "TFR", "chassis": "171544", "engine": "9277", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 305, "plate": "ا ل ن 8958", "branch": "ليدر بنها", "model": "2026", "type": "TFR", "chassis": "176809", "engine": "6489", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "17/9/2026", "license_status": "سارية"}, {"id": 306, "plate": "ا ل ن 8959", "branch": "ليدر بنها", "model": "2026", "type": "TFR", "chassis": "180736", "engine": "6450", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "17/9/2026", "license_status": "سارية"}, {"id": 307, "plate": "ا ل م 8248", "branch": "راني الجيزة", "model": "2025", "type": "TFR", "chassis": "178937", "engine": "4089", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 308, "plate": "ا ل م 8238", "branch": "راني الجيزة", "model": "2025", "type": "TFR", "chassis": "178788", "engine": "4057", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 309, "plate": "ا ل ق 5258", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "575", "engine": "1001117", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-07-07", "license_status": "سارية"}, {"id": 310, "plate": "ا ل ق 3934", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "557", "engine": "1001125", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/3/2027", "license_status": "سارية"}, {"id": 311, "plate": "ا ل ع 8252", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "360", "engine": "55596", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 312, "plate": "ا ل ع 8191", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "394", "engine": "56922", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 313, "plate": "ا ل ع 8248", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "399", "engine": "59553", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 314, "plate": "ا ل ع 8232", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "385", "engine": "55583", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 315, "plate": "ا ل ع 8218", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "397", "engine": "55776", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 316, "plate": "ا ل ف 4342", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "590", "engine": "1002104", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/1/2027", "license_status": "سارية"}, {"id": 317, "plate": "ا ل ف 4373", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "593", "engine": "1002089", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "29/1/2026", "license_status": "سارية"}, {"id": 318, "plate": "ا ل ف 4374", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "609", "engine": "1002332", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/1/2027", "license_status": "سارية"}, {"id": 319, "plate": "ا ل ف 4384", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "603", "engine": "1002382", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "29/1/2026", "license_status": "سارية"}, {"id": 320, "plate": "ا ل ف 4393", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "567", "engine": "1002090", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/1/2027", "license_status": "سارية"}, {"id": 321, "plate": "ا ل ف 4515", "branch": "راني الجيزة", "model": "2025", "type": "JMC", "chassis": "610", "engine": "1002103", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/1/2027", "license_status": "سارية"}, {"id": 322, "plate": "ا ل ق 5256", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "778", "engine": "1002713", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-07-07", "license_status": "سارية"}, {"id": 323, "plate": "ا ل ق 5257", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "649", "engine": "1002375", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-07-07", "license_status": "سارية"}, {"id": 324, "plate": "ا ل ق 5156", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "542", "engine": "1001123", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-07-07", "license_status": "سارية"}, {"id": 325, "plate": "ا ل م 8242", "branch": "راني القاهرة", "model": "2026", "type": "TFR", "chassis": "178639", "engine": "4294", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 326, "plate": "ا ل ع 7917", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "383", "engine": "55786", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 327, "plate": "ا ل ع 7919", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "384", "engine": "55787", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2025", "license_status": "سارية"}, {"id": 328, "plate": "ا ل ع 7927", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "387", "engine": "55791", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "21/12/2025", "license_status": "سارية"}, {"id": 329, "plate": "ا ل ع 7929", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "392", "engine": "55579", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 330, "plate": "ا ل ع 7937", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "388", "engine": "55789", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 331, "plate": "ا ل م 8218", "branch": "راني القاهرة", "model": "2026", "type": "TFR", "chassis": "178880", "engine": "4094", "leasing": "اميل للخدمات المالية", "license_expiry": "2026-12-07", "license_status": "سارية"}, {"id": 332, "plate": "ا ل ع 7967", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "323", "engine": "58587", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 333, "plate": "ا ل ع 7969", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "363", "engine": "55783", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "21/12/2025", "license_status": "سارية"}, {"id": 334, "plate": "ا ل ع 7971", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "322", "engine": "58584", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 335, "plate": "ا ل ع 7939", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "382", "engine": "55585", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 336, "plate": "ا ل ع 8148", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "351", "engine": "56912", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2025", "license_status": "سارية"}, {"id": 337, "plate": "ا ل ع 8161", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "358", "engine": "58145", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2025", "license_status": "سارية"}, {"id": 338, "plate": "ا ل ع 8182", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "369", "engine": "55597", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2025", "license_status": "سارية"}, {"id": 339, "plate": "ا ل ع 8183", "branch": "راني القاهرة", "model": "2025", "type": "JMC", "chassis": "379", "engine": "55582", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2025", "license_status": "سارية"}, {"id": 340, "plate": "ا ل م 9493", "branch": "راني القاهرة", "model": "2026", "type": "NPR", "chassis": "177112", "engine": "477", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "21/7/2026", "license_status": "سارية"}, {"id": 341, "plate": "ا ل ق 5181", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "798", "engine": "2003151", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-07-07", "license_status": "سارية"}, {"id": 342, "plate": "ا ل ع 7949", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "377", "engine": "55581", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 343, "plate": "ا ل ع 7957", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "375", "engine": "56313", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 344, "plate": "ا ل ع 7959", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "380", "engine": "56923", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 345, "plate": "ا ل ق 5161", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "776", "engine": "2003262", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-07-07", "license_status": "سارية"}, {"id": 346, "plate": "ا ل ع 7972", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "401", "engine": "56310", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "18/12/2026", "license_status": "سارية"}, {"id": 347, "plate": "ا ل ا 8463", "branch": "راني القومية", "model": "2022", "type": "JMC", "chassis": "254", "engine": "157289", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-06-08", "license_status": "سارية"}, {"id": 348, "plate": "ا ل ا 8394", "branch": "راني القومية", "model": "2022", "type": "JMC", "chassis": "610", "engine": "2040910", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-05-08", "license_status": "سارية"}, {"id": 349, "plate": "ا ل ف 4524", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "612", "engine": "1002351", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "29/1/2026", "license_status": "سارية"}, {"id": 350, "plate": "ا ل ف 4514", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "597", "engine": "1002095", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/1/2027", "license_status": "سارية"}, {"id": 351, "plate": "ا ل ع 8198", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "386", "engine": "55592", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 352, "plate": "ا ل ا 8465", "branch": "راني القومية", "model": "2022", "type": "JMC", "chassis": "226", "engine": "152795", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2025-06-08", "license_status": "سارية"}, {"id": 353, "plate": "ا ل ط 1464", "branch": "راني القومية", "model": "2022", "type": "JMC", "chassis": "2386", "engine": "7103062", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/12/2025", "license_status": "سارية"}, {"id": 354, "plate": "ا ل ف 4364", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "611", "engine": "1002346", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "29/1/2026", "license_status": "سارية"}, {"id": 355, "plate": "ا ل ع 8212", "branch": "راني القومية", "model": "2025", "type": "JMC", "chassis": "390", "engine": "55587", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "22/12/2026", "license_status": "سارية"}, {"id": 356, "plate": "ا ط ف 4927", "branch": "راني القومية", "model": "2023", "type": "NPR - بيك اب", "chassis": "127732", "engine": "26", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "26/11/2025", "license_status": "سارية"}, {"id": 357, "plate": "ا ج م 4939", "branch": "راني القومية", "model": "2022", "type": "JMC", "chassis": "884", "engine": "3045624", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-01-07", "license_status": "سارية"}, {"id": 358, "plate": "ا ل ط 1454", "branch": "بن شاهين المقطم", "model": "2022", "type": "JMC", "chassis": "2239", "engine": "7098575", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "24/12/2026", "license_status": "سارية"}, {"id": 359, "plate": "ا ل ص 6946", "branch": "بن شاهين المقطم", "model": "2022", "type": "JMC", "chassis": "1985", "engine": "7093878", "leasing": "جي بي للتأجير التمويلي والتخصيم", "license_expiry": "2026-02-12", "license_status": "سارية"}, {"id": 360, "plate": "ا ل ف 4654", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503540", "engine": "1274507", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 361, "plate": "ا ل ف 4684", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503561", "engine": "1274519", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 362, "plate": "ا ل ف 4694", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503545", "engine": "1274510", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 363, "plate": "ا ل ف 4674", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503562", "engine": "1274533", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 364, "plate": "ا ل ف 4714", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503543", "engine": "1274522", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 365, "plate": "ا ل ف 4717", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503552", "engine": "1274530", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 366, "plate": "ا ل ف 4696", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503571", "engine": "1274535", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 367, "plate": "ا ل ف 4686", "branch": "بن شاهين المقطم", "model": "2025", "type": "سوزوكي فان", "chassis": "503556", "engine": "1274517", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "31/1/2027", "license_status": "سارية"}, {"id": 368, "plate": "ر ط ى 627", "branch": "خدمات القاهرة", "model": "2019", "type": "لانوس", "chassis": "941133", "engine": "182770001", "leasing": "شركة قباء للصناعة والتجارة", "license_expiry": "23/8/2026", "license_status": "سارية"}, {"id": 369, "plate": "ا ل ق 7374", "branch": "مولفيكس البدرشين", "model": "2025", "type": "TFR", "chassis": "171547", "engine": "9261", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 370, "plate": "ا ل ق 7367", "branch": "مولفيكس البدرشين", "model": "2025", "type": "TFR", "chassis": "171339", "engine": "9250", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 371, "plate": "ا ل ق 7372", "branch": "مولفيكس البدرشين", "model": "2025", "type": "TFR", "chassis": "171576", "engine": "8233", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "28/7/2026", "license_status": "سارية"}, {"id": 372, "plate": "ا ل ق 9395", "branch": "مولفيكس البدرشين", "model": "2025", "type": "NPR", "chassis": "175052", "engine": "706", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "2026-10-08", "license_status": "سارية"}, {"id": 373, "plate": "ا ل د 9469", "branch": "مولفيكس البدرشين", "model": "2024", "type": "NPR", "chassis": "154127", "engine": "322", "leasing": "كيو ان بي للتأجير التمويلي", "license_expiry": "22/7/2026", "license_status": "سارية"}, {"id": 374, "plate": "ا ص ا 7594", "branch": "مولفيكس البدرشين", "model": "2026", "type": "TFR", "chassis": "", "engine": "", "leasing": "", "license_expiry": "", "license_status": "سارية"}, {"id": 375, "plate": "ا ب و 7893", "branch": "مولفيكس البدرشين", "model": "2026", "type": "TFR", "chassis": "206073", "engine": "2593", "leasing": "الدولية للتأجير التمويلي - انكوليس", "license_expiry": "25/7/2026", "license_status": "اول مرة"}];
+
+  let allCars = [];
+  let fleetList = [];
+  let invoicesList = [];
+  let usersList = [];
+  let messagesList = [];
+  let currentUser = JSON.parse(localStorage.getItem('qabaa_cloud_user')) || null;
+  let lastInvoiceCount = -1;
+
+  function showLoading(show) {
+    document.getElementById('loadingBanner').style.display = show ? 'block' : 'none';
+  }
+
+  function playAlertSound() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.25);
+    } catch (e) {}
+  }
+
+  async function apiGet() {
+    showLoading(true);
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      showLoading(false);
+      return data;
+    } catch (err) {
+      showLoading(false);
+      alert("⚠️ تعذر الاتصال بقاعدة البيانات السحابية. تأكد من اتصال الإنترنت.");
+      return null;
+    }
+  }
+
+  async function apiPost(payload) {
+    showLoading(true);
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      await syncFromCloud(false);
+    } catch (err) {
+      showLoading(false);
+      alert("⚠️ حدث خطأ أثناء الحفظ على السحابة.");
+    }
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const pass = document.getElementById('loginPass').value.trim();
+
+    const data = await apiGet();
+    if (!data) return;
+
+    usersList = data.users || [];
+    const matched = usersList.find(u => String(u.email).trim().toLowerCase() === email && String(u.password).trim() === pass);
+    
+    if (matched) {
+      currentUser = matched;
+      localStorage.setItem('qabaa_cloud_user', JSON.stringify(currentUser));
+      enterAppWithData(data);
+    } else {
+      alert("❌ البريد الإلكتروني أو كلمة المرور غير صحيحة!");
+    }
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('qabaa_cloud_user');
+    currentUser = null;
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('mainApp').style.display = 'none';
+  }
+
+  async function syncFromCloud(manual = false) {
+    const data = await apiGet();
+    if (data) {
+      enterAppWithData(data);
+      if (manual) alert("✅ تم تحديث البيانات من السحابة بنجاح!");
+    }
+  }
+
+  function enterAppWithData(data) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('currentUserName').textContent = currentUser.name;
+
+    allCars = data.cars || [];
+    usersList = data.users || [];
+    
+    // Show 1-click upload banner if Cars sheet is empty
+    document.getElementById('seedFleetBanner').style.display = (allCars.length === 0 && currentUser.role === 'admin') ? 'flex' : 'none';
+
+    if (currentUser.role === 'supervisor' && currentUser.branch) {
+      fleetList = allCars.filter(c => String(c.branch).trim() === String(currentUser.branch).trim());
+      invoicesList = (data.invoices || []).filter(i => String(i.branch).trim() === String(currentUser.branch).trim());
+    } else {
+      fleetList = allCars;
+      invoicesList = data.invoices || [];
+    }
+
+    if (lastInvoiceCount !== -1 && invoicesList.length > lastInvoiceCount) {
+      playAlertSound();
+    }
+    lastInvoiceCount = invoicesList.length;
+
+    messagesList = (data.messages || [])
+      .filter(m => m.to === 'all' || m.to === currentUser.email || m.fromEmail === currentUser.email)
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    applyRolePermissions();
+    refreshUI();
+    checkLicenseExpirations();
+  }
+
+  function applyRolePermissions() {
+    const role = currentUser.role;
+    document.getElementById('tabUsersAdmin').style.display = role === 'admin' ? 'block' : 'none';
+    document.getElementById('tabFleetAdmin').style.display = role === 'admin' ? 'block' : 'none';
+    document.getElementById('thDelInv').style.display = role === 'admin' ? 'table-cell' : 'none';
+  }
+
+  async function uploadInitial373Cars() {
+    if (!confirm("هل تريد رفع بيانات الـ 373 سيارة الآن إلى Google Sheets؟ سيستغرق ذلك بضع ثوانٍ.")) return;
+    await apiPost({ action: "bulkImportCars", cars: EMBEDDED_373_CARS });
+    alert("🎉 تم رفع الـ 373 سيارة بنجاح إلى السحابة!");
+  }
+
+  function checkLicenseExpirations() {
+    const today = new Date();
+    const soon = new Date();
+    soon.setDate(today.getDate() + 15);
+    const expiring = fleetList.filter(c => {
+      if (!c.license_expiry) return false;
+      const d = parseArabicDate(String(c.license_expiry));
+      return d && d <= soon;
+    });
+    const totalAlerts = expiring.length + messagesList.length;
+    if (totalAlerts > 0) {
+      document.getElementById('notifBadge').style.display = 'inline-block';
+      document.getElementById('notifBadge').textContent = totalAlerts;
+      if (expiring.length > 0) playAlertSound();
+    }
+  }
+
+  function parseArabicDate(str) {
+    if (str.includes('-')) return new Date(str);
+    const parts = str.split('/');
+    if (parts.length === 3) return new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`);
+    return null;
+  }
+
+  async function compressImageToBase64(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxW = 600;
+          const scale = maxW / img.width;
+          canvas.width = maxW;
+          canvas.height = img.height * scale;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.55));
+        };
+      };
+    });
+  }
+
+  async function saveNewInvoice(e) {
+    e.preventDefault();
+    const plate = document.getElementById('invPlate').value.trim();
+    const car = fleetList.find(c => String(c.plate).trim() === plate);
+    if (!car) return alert("⚠️ رقم السيارة غير مسجل في نطاق صلاحياتك!");
+
+    let imageUrl = "";
+    const fileInput = document.getElementById('invImageFile');
+    if (fileInput.files.length > 0) {
+      imageUrl = await compressImageToBase64(fileInput.files[0]);
+    }
+
+    const parts = Number(document.getElementById('invParts').value) || 0;
+    const labor = Number(document.getElementById('invLabor').value) || 0;
+
+    await apiPost({
+      action: "addInvoice",
+      data: {
+        id: Date.now(),
+        date: document.getElementById('invDate').value,
+        plate,
+        branch: car.branch,
+        km: Number(document.getElementById('invKm').value),
+        serviceType: document.getElementById('invServiceType').value,
+        workshop: document.getElementById('invWorkshop').value.trim(),
+        desc: document.getElementById('invDesc').value.trim(),
+        parts,
+        labor,
+        total: parts + labor,
+        imageUrl,
+        createdBy: currentUser.name,
+        userEmail: currentUser.email,
+        createdAt: new Date().toISOString()
+      }
+    });
+
+    document.getElementById('invoiceForm').reset();
+    document.getElementById('invDate').valueAsDate = new Date();
+    alert("✅ تم حفظ الفاتورة على السحابة وإرسال إشعار للإدارة!");
+  }
+
+  function viewInvoiceImage(base64Data) {
+    document.getElementById('previewImgTag').src = base64Data;
+    document.getElementById('imagePreviewModal').style.display = 'flex';
+  }
+
+  async function sendInternalMessage() {
+    const to = document.getElementById('msgRecipientSelect').value;
+    const text = document.getElementById('msgBodyInput').value.trim();
+    if (!text) return;
+    await apiPost({
+      action: "sendMessage",
+      data: {
+        fromName: currentUser.name,
+        fromEmail: currentUser.email,
+        to,
+        text
+      }
+    });
+    document.getElementById('msgBodyInput').value = '';
+    alert("✅ تم إرسال الرسالة بنجاح");
+  }
+
+  async function registerNewSystemUser(e) {
+    e.preventDefault();
+    await apiPost({
+      action: "addUser",
+      data: {
+        name: document.getElementById('newUserName').value.trim(),
+        email: document.getElementById('newUserEmail').value.trim().toLowerCase(),
+        password: document.getElementById('newUserPass').value.trim(),
+        role: document.getElementById('newUserRole').value,
+        branch: document.getElementById('newUserBranch').value.trim() || "الكل"
+      }
+    });
+    e.target.reset();
+    alert("✅ تم إنشاء حساب المستخدم وتفعيل صلاحياته بنجاح!");
+  }
+
+  function downloadCloudBackup() {
+    const backup = { exportedAt: new Date().toISOString(), cars: allCars, invoices: invoicesList, users: usersList };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `نسخة_احتياطية_صيانات_قباء_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+  }
+
+  function executeAdvancedExport() {
+    const fromD = document.getElementById('expFromDate').value;
+    const toD = document.getElementById('expToDate').value;
+    const scope = document.getElementById('expScope').value;
+    const target = document.getElementById('expTargetInput').value.trim();
+
+    let filtered = invoicesList.filter(inv => {
+      const d = String(inv.date).split('T')[0];
+      if (fromD && d < fromD) return false;
+      if (toD && d > toD) return false;
+      if (scope === 'branch' && String(inv.branch).trim() !== target) return false;
+      if (scope === 'car' && String(inv.plate).trim() !== target) return false;
+      return true;
+    });
+
+    let csv = '\uFEFFم,التاريخ,رقم السيارة,الفرع,العداد,نوع الصيانة,البيان,الورشة,قطع الغيار,المصنعية,الإجمالي,المسجل\n';
+    filtered.forEach((inv, i) => {
+      csv += `${i+1},"${String(inv.date).split('T')[0]}","${inv.plate}","${inv.branch}",${inv.km},"${inv.serviceType}","${inv.desc}","${inv.workshop}",${inv.parts},${inv.labor},${inv.total},"${inv.createdBy}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `تقرير_صيانات_قباء_${scope}.csv`;
+    a.click();
+    closeModal('exportModal');
+  }
+
+  function refreshUI() {
+    document.getElementById('kpiTotalCars').textContent = fleetList.length;
+    document.getElementById('kpiTotalCost').textContent = invoicesList.reduce((s, i) => s + Number(i.total || 0), 0).toLocaleString() + ' ج.م';
+    document.getElementById('kpiTotalInvoices').textContent = invoicesList.length;
+    document.getElementById('kpiTotalBranches').textContent = new Set(fleetList.map(c => c.branch)).size;
+
+    const dl = document.getElementById('platesList');
+    dl.innerHTML = fleetList.map(c => `<option value="${c.plate}">${c.branch} - ${c.type}</option>`).join('');
+
+    const bList = document.getElementById('branchesList');
+    bList.innerHTML = [...new Set(allCars.map(c => c.branch))].map(b => `<option value="${b}">`).join('');
+
+    lookupCarForQuery();
+    renderAllInvoices();
+    renderBranchesSummary();
+    renderFleetTable();
+    renderUsersTable();
+    renderNotifications();
+  }
+
+  function lookupCarForQuery() {
+    const plate = document.getElementById('queryPlateInput').value.trim();
+    const car = fleetList.find(c => String(c.plate).trim() === plate);
+    document.getElementById('qPlate').textContent = car ? car.plate : '-';
+    document.getElementById('qBranch').textContent = car ? car.branch : '-';
+    document.getElementById('qModelType').textContent = car ? `${car.type} (${car.model})` : '-';
+    document.getElementById('qChassis').textContent = car?.chassis || '-';
+    document.getElementById('qEngine').textContent = car?.engine || '-';
+    document.getElementById('qLicenseExp').textContent = car?.license_expiry ? String(car.license_expiry).split('T')[0] : '-';
+
+    const hist = invoicesList.filter(i => String(i.plate).trim() === plate).sort((a, b) => new Date(a.date) - new Date(b.date));
+    document.getElementById('qCarTotalCost').textContent = hist.reduce((s, i) => s + Number(i.total), 0).toLocaleString() + ' ج.م';
+    document.getElementById('qCarInvCount').textContent = hist.length + ' فاتورة';
+    document.getElementById('qCarLastKm').textContent = hist.length ? Number(hist[hist.length-1].km).toLocaleString() + ' كم' : '-';
+    document.getElementById('qCarLastDate').textContent = hist.length ? String(hist[hist.length-1].date).split('T')[0] : '-';
+
+    document.getElementById('qCarHistoryBody').innerHTML = hist.map((i, idx) => `
+      <tr>
+        <td>${idx+1}</td><td>${String(i.date).split('T')[0]}</td><td>${i.km}</td><td><span class="badge">${i.serviceType}</span></td>
+        <td>${i.desc}</td><td>${i.workshop}</td><td>${i.parts}</td><td>${i.labor}</td><td><strong>${i.total}</strong></td>
+        <td>${i.imageUrl ? `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.78rem;" onclick="viewInvoiceImage('${i.imageUrl}')">👁️ عرض</button>` : '-'}</td>
+        <td>${i.createdBy || '-'}</td>
+      </tr>
+    `).join('');
+  }
+
+  function autoFillInvoiceCar() {
+    const car = fleetList.find(c => String(c.plate).trim() === document.getElementById('invPlate').value.trim());
+    document.getElementById('invBranch').value = car ? car.branch : '';
+    document.getElementById('invModelType').value = car ? `${car.type} - ${car.model}` : '';
+  }
+
+  function calcInvoiceTotal() {
+    const total = (Number(document.getElementById('invParts').value) || 0) + (Number(document.getElementById('invLabor').value) || 0);
+    document.getElementById('invTotal').value = total.toLocaleString() + ' ج.م';
+  }
+
+  function renderAllInvoices() {
+    document.getElementById('allInvoicesBody').innerHTML = invoicesList.map((i, idx) => `
+      <tr>
+        <td>${idx+1}</td><td>${String(i.date).split('T')[0]}</td><td><strong>${i.plate}</strong></td><td>${i.branch}</td>
+        <td>${i.serviceType}</td><td>${i.desc}</td><td><strong>${i.total} ج.م</strong></td>
+        <td>${i.imageUrl ? `<button class="btn btn-primary" style="padding:4px 8px; font-size:0.78rem;" onclick="viewInvoiceImage('${i.imageUrl}')">👁️ صورة</button>` : '-'}</td>
+        <td>${i.createdBy || '-'}</td>
+        <td>${currentUser.role === 'admin' ? `<button class="btn btn-danger" onclick="deleteInvoice('${i.id}')">حذف</button>` : '-'}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderBranchesSummary() {
+    const map = {};
+    fleetList.forEach(c => { if (!map[c.branch]) map[c.branch] = { cars: 0, count: 0, cost: 0 }; map[c.branch].cars++; });
+    invoicesList.forEach(i => { if (!map[i.branch]) map[i.branch] = { cars: 0, count: 0, cost: 0 }; map[i.branch].count++; map[i.branch].cost += Number(i.total || 0); });
+    document.getElementById('branchesSummaryBody').innerHTML = Object.entries(map).map(([b, s], i) => `
+      <tr><td>${i+1}</td><td><strong>${b}</strong></td><td>${s.cars}</td><td>${s.count}</td><td><strong>${s.cost.toLocaleString()} ج.م</strong></td></tr>
+    `).join('');
+  }
+
+  function renderFleetTable() {
+    const q = document.getElementById('filterFleetAdmin').value.trim().toLowerCase();
+    const filtered = fleetList.filter(c => String(c.plate).toLowerCase().includes(q) || String(c.branch).toLowerCase().includes(q));
+    document.getElementById('fleetTableBody').innerHTML = filtered.map((c, i) => `
+      <tr>
+        <td>${i+1}</td><td><strong>${c.plate}</strong></td><td><span class="badge">${c.branch}</span></td><td>${c.model}</td><td>${c.type}</td>
+        <td>${c.chassis || '-'}</td><td>${c.license_expiry ? String(c.license_expiry).split('T')[0] : '-'}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-amber" onclick="openCarModal('${c.plate}')">✏️ تعديل / نقل</button>
+          <button class="btn btn-danger" onclick="deleteCar('${c.plate}')">حذف</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderUsersTable() {
+    document.getElementById('usersListBody').innerHTML = usersList.map(u => `
+      <tr><td>${u.name}</td><td>${u.email}</td><td>${u.password}</td><td>${u.role}</td><td>${u.branch || 'الكل'}</td></tr>
+    `).join('');
+    document.getElementById('msgRecipientSelect').innerHTML = `<option value="all">الجميع (تعميم)</option>` + usersList.map(u => `<option value="${u.email}">${u.name}</option>`).join('');
+  }
+
+  function renderNotifications() {
+    const today = new Date();
+    const soon = new Date(); soon.setDate(today.getDate() + 15);
+    const expHtml = fleetList.filter(c => {
+      if (!c.license_expiry) return false;
+      const d = parseArabicDate(String(c.license_expiry));
+      return d && d <= soon;
+    }).map(c => `
+      <div class="msg-item alert-license">⚠️ <strong>تنبيه ترخيص:</strong> رخصة السيارة <b>${c.plate}</b> (${c.branch}) تنتهي في ${String(c.license_expiry).split('T')[0]}</div>
+    `).join('');
+
+    const msgHtml = messagesList.map(m => `
+      <div class="msg-item ${m.type === 'update' ? 'alert-update' : ''}">
+        <strong>${m.fromName}:</strong> ${m.text}
+        <div style="font-size:0.75rem; color:#64748b; margin-top:4px;">${new Date(m.timestamp).toLocaleString('ar-EG')}</div>
+      </div>
+    `).join('');
+
+    document.getElementById('notificationsContainer').innerHTML = expHtml + msgHtml;
+  }
+
+  async function deleteInvoice(id) {
+    if (confirm("هل أنت متأكد من حذف هذه الفاتورة نهائياً؟")) {
+      await apiPost({ action: "deleteInvoice", id });
+    }
+  }
+
+  async function deleteCar(plate) {
+    if (confirm(`هل أنت متأكد من حذف السيارة (${plate}) من الأسطول؟`)) {
+      await apiPost({ action: "deleteCar", plate });
+    }
+  }
+
+  function openCarModal(plateToEdit = null) {
+    document.getElementById('editOrigPlate').value = plateToEdit || '';
+    if (plateToEdit) {
+      const c = fleetList.find(x => String(x.plate).trim() === String(plateToEdit).trim());
+      if (c) {
+        document.getElementById('carModalTitle').textContent = `✏️ تعديل أو نقل فرع السيارة (${c.plate})`;
+        document.getElementById('mPlate').value = c.plate;
+        document.getElementById('mBranch').value = c.branch;
+        document.getElementById('mModel').value = c.model;
+        document.getElementById('mType').value = c.type;
+        document.getElementById('mChassis').value = c.chassis || '';
+        document.getElementById('mEngine').value = c.engine || '';
+        document.getElementById('mLeasing').value = c.leasing || '';
+        document.getElementById('mLicenseExp').value = c.license_expiry ? String(c.license_expiry).split('T')[0] : '';
+      }
+    } else {
+      document.getElementById('carModalTitle').textContent = '➕ إضافة سيارة / فرع جديد';
+      document.getElementById('mPlate').value = '';
+      document.getElementById('mBranch').value = '';
+      document.getElementById('mModel').value = '';
+      document.getElementById('mType').value = '';
+      document.getElementById('mChassis').value = '';
+      document.getElementById('mEngine').value = '';
+      document.getElementById('mLeasing').value = '';
+      document.getElementById('mLicenseExp').value = '';
+    }
+    document.getElementById('carModal').style.display = 'flex';
+  }
+
+  async function saveCarData(e) {
+    e.preventDefault();
+    const origPlate = document.getElementById('editOrigPlate').value;
+    await apiPost({
+      action: "saveCar",
+      origPlate,
+      data: {
+        plate: document.getElementById('mPlate').value.trim(),
+        branch: document.getElementById('mBranch').value.trim(),
+        model: document.getElementById('mModel').value.trim(),
+        type: document.getElementById('mType').value.trim(),
+        chassis: document.getElementById('mChassis').value.trim(),
+        engine: document.getElementById('mEngine').value.trim(),
+        leasing: document.getElementById('mLeasing').value.trim(),
+        license_expiry: document.getElementById('mLicenseExp').value.trim()
+      }
+    });
+    closeModal('carModal');
+    alert("✅ تم حفظ بيانات السيارة وتحديث التوزيع على السحابة!");
+  }
+
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(e => e.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+  function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
+  function openNotifModal() { document.getElementById('notifModal').style.display = 'flex'; document.getElementById('notifBadge').style.display = 'none'; }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+  function toggleExportScopeInput() {
+    const s = document.getElementById('expScope').value;
+    document.getElementById('expTargetGroup').style.display = s === 'all' ? 'none' : 'flex';
+    document.getElementById('expTargetLabel').textContent = s === 'branch' ? 'اسم الفرع' : 'رقم السيارة';
+  }
+  function toggleBranchAssign() {
+    document.getElementById('assignBranchGroup').style.display = document.getElementById('newUserRole').value === 'supervisor' ? 'flex' : 'none';
+  }
+
+  document.getElementById('invDate').valueAsDate = new Date();
+  if (currentUser) {
+    syncFromCloud(false);
+  }
+  setInterval(() => {
+    if (currentUser) syncFromCloud(false);
+  }, 45000);
+</script>
+</body>
+</html>
